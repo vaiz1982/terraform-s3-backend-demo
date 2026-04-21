@@ -1,0 +1,37 @@
+---
+- name: Install Terraform
+  hosts: localhost
+  become: yes
+  tasks:
+    - name: Install prerequisites
+      apt:
+        name:
+          - gnupg
+          - software-properties-common
+          - curl
+        state: present
+        update_cache: yes
+
+    - name: Add HashiCorp GPG key
+      apt_key:
+        url: https://apt.releases.hashicorp.com/gpg
+        state: present
+
+    - name: Add HashiCorp repository
+      apt_repository:
+        repo: "deb https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main"
+        state: present
+        update_cache: yes
+
+    - name: Install Terraform
+      apt:
+        name: terraform
+        state: present
+
+    - name: Verify Terraform installation
+      command: terraform --version
+      register: tf_version
+
+    - name: Show version
+      debug:
+        msg: "{{ tf_version.stdout }}"
